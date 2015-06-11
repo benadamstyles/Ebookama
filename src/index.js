@@ -5,7 +5,7 @@ import c from 'chalk';
 import fs from 'fs';
 import mkd from 'mkdirp';
 import unzip from 'unzip';
-import Promise from 'bluebird';
+// import Promise from 'bluebird';
 import resumer from 'resumer';
 import zip from 'epub-zip';
 import cson from 'cson-parser';
@@ -23,32 +23,51 @@ Object.assign(_, underscore);
 const log = console.log,
       logE = _.compose(log, c.bgRed.inverse),
       logS = _.compose(log, c.green),
-      nodeArgs = process.argv.slice(2);
+      nodeArgs = process.argv.slice(2),
+      fileTypes = ['css', 'opf', 'xhtml', 'html'],
+      csv = glob.sync('*.csv')[0],
+      config = JSON.parse(fs.readFileSync('config.json', 'utf8')),
+      srcFilePath = nodeArgs.length ? nodeArgs[0] : glob.sync('*.epub')[0],
+      srcFileName = nodeArgs.length ?
+        srcFilePath.substr(srcFilePath.lastIndexOf('/') + 1) : srcFilePath;
 
-Object.assign(transformers, {
-  // regexes from regexes.json
-});
+fileTypes.forEach(ft => Object.assign(transformers[ft], {
+  regexes: doc => {
+    var res = doc;
+    if (config.regexes && config.regexes[ft] && config.regexes[ft].length) {
+      for (let i = 0, l = config.regexes[ft].length; i < l; i++) {
+        const reg = config.regexes[ft][i],
+              regFind = new RegExp(reg.find, 'g');
 
-// TODO 'use' (weak) and 'ignore' (strong) properties in config.json to choose which transformers to use (default all)
+        log(regFind, reg.replace);
+
+        res = res.replace(regFind, reg.replace);
+      }
+    }
+    return res;
+  }
+}));
+
+// TODO 'use' (weak) and 'ignore' (strong) properties in config.json
+// to choose which transformers to use (default all)
 
 function setUpTransformers(keyStr) {
   return _.pipeline(_.values(transformers[keyStr]));
 }
 
-const edit = {
-  'css': setUpTransformers(css),
-  'opf': setUpTransformers(opf),
-  'xhtml': setUpTransformers(html),
-  'html': setUpTransformers(html)
-};
+const edit = _.object(fileTypes.map(ft => [ft, setUpTransformers(ft)]));
 
 fs.createReadStream(srcFilePath)
+
+// unzip the epub
 .pipe(unzip.Parse())
+
+// every time we get an unzipped file, process it
 .on('entry', entry => {
 
   const filePath = entry.path,
         fileEnding = filePath.substring(filePath.lastIndexOf('.') + 1),
-        folderSep = filePath.incldues('/') ? '/' : '\\',
+        folderSep = filePath.includes('/') ? '/' : '\\',
         fileDir = filePath.substr(0, filePath.length - fileEnding.length)
           .substring(0, filePath.lastIndexOf(folderSep) + 1),
         run = entry => new Promise((resolve, reject) => {
