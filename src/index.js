@@ -18,6 +18,7 @@ import "babel/register";
 // my modules
 import transformers from "./modules/transformers";
 
+// make sure we're using the latest underscore methods
 Object.assign(_, underscore);
 
 const log = console.log,
@@ -26,7 +27,7 @@ const log = console.log,
       nodeArgs = process.argv.slice(2),
       fileTypes = ['css', 'opf', 'xhtml', 'html'],
       csv = glob.sync('*.csv')[0],
-      config = JSON.parse(fs.readFileSync('config.json', 'utf8')),
+      config = cson.parse(fs.readFileSync('config.cson', 'utf8')),
       srcFilePath = nodeArgs.length ? nodeArgs[0] : glob.sync('*.epub')[0],
       srcFileName = nodeArgs.length ?
         srcFilePath.substr(srcFilePath.lastIndexOf('/') + 1) : srcFilePath;
@@ -48,7 +49,7 @@ fileTypes.forEach(ft => Object.assign(transformers[ft], {
   }
 }));
 
-// TODO 'use' (weak) and 'ignore' (strong) properties in config.json
+// TODO 'ignore' property in config.json
 // to choose which transformers to use (default all)
 
 function setUpTransformers(keyStr) {
@@ -57,12 +58,14 @@ function setUpTransformers(keyStr) {
 
 const edit = _.object(fileTypes.map(ft => [ft, setUpTransformers(ft)]));
 
+
+// processing begins here -->
 fs.createReadStream(srcFilePath)
 
 // unzip the epub
 .pipe(unzip.Parse())
 
-// every time we get an unzipped file, process it
+// every time we get an unzipped file, work on it
 .on('entry', entry => {
 
   const filePath = entry.path,
@@ -104,6 +107,7 @@ fs.createReadStream(srcFilePath)
   }
 });
 
+// closing up
 process.on('exit', () => {
   try {
     let epub = zip("./out");
