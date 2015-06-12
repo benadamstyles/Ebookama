@@ -9,29 +9,7 @@ const transformers = {
   },
 
   css: {
-
-    indents: doc => doc
-      .replace(/\D14px/g, '1.3em')
-      .replace(/\D28px/g, '2.6em')
-      .replace(/\D43px/g,	'3.9em')
-      .replace(/\D57px/g,	'5.2em')
-      .replace(/\D71px/g,	'6.5em')
-      .replace(/\D85px/g,	'7.8em')
-      .replace(/\D99px/g,	'9.1em')
-      .replace(/\D113px/g, '10.4em')
-      .replace(/\D128px/g, '11.7em')
-      .replace(/\D142px/g, '13em')
-      .replace(/\D156px/g, '14.3em')
-      .replace(/\D170px/g, '15.6em')
-      .replace(/\D184px/g, '16.9em')
-      .replace(/\D198px/g, '18.2em'),
-
-    amznISBN: doc =>
-`${doc}
-@media amzn-mobi, amzn-kf8 {
-  .isbn {display: none;}
-}`
-
+    //
   },
 
   opf: {
