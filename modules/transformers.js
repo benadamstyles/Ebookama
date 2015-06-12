@@ -1,3 +1,29 @@
+import {metadata, config} from "../index";
+
+function swapNames(name) {
+  const comma = name.indexOf(',');
+  if (~comma) {
+    let ln = name.substring(0, comma),
+        fn = name.substring(comma + 1).trim();
+    return `${fn} ${ln}`;
+  } else {
+    let sep = name.lastIndexOf(' '),
+        fn = name.substring(0, sep),
+        ln = name.substring(sep + 1).trim();
+    return `${ln}, ${fn}`;
+  }
+}
+
+function insertAfter(doc, locator, str) {
+  const i = doc.indexOf(locator) + locator.length;
+  return doc.substr(0, i) + str + doc.substr(i, doc.length);
+}
+
+function insertBefore(doc, locator, str) {
+  const i = doc.indexOf(locator);
+  return doc.substr(0, i) + str + doc.substr(i, doc.length);
+}
+
 const transformers = {
 
   html: {
@@ -15,11 +41,13 @@ const transformers = {
   opf: {
 
     title: doc => {
-      var newTitle = "<dc:title>" + metadata.Title +
-        (metadata.Subtitle ? (': ' + metadata.Subtitle) : '') +
-        "</dc:title>";
+      if (!metadata) return doc;
 
-      if (!csv) return doc;
+      const newTitle = `<dc:title>${metadata.Title}${(
+        metadata.Subtitle ?
+          (': ' + metadata.Subtitle) :
+          ''
+        )}</dc:title>`;
 
       if (doc.includes('<dc:title />')) return doc.replace('<dc:title />', newTitle);
       else if (doc.includes("<dc:title></dc:title>")) return doc.replace("<dc:title></dc:title>", newTitle);
@@ -38,13 +66,13 @@ const transformers = {
     },
 
     author: doc => {
-      var newAuthor;
-      if (!csv) return doc;
+      if (!metadata['Author (First, Last)']) return doc;
 
-      newAuthor = '<dc:creator xmlns:opf="http://www.idpf.org/2007/opf" opf:file-as="' +
-      swapNames(metadata['Author (First, Last)']) +
-      '" opf:role="aut">' +
-      metadata['Author (First, Last)'] + '</dc:creator>';
+      const newAuthor = `<dc:creator xmlns:opf="http://www.idpf.org/2007/opf" opf:file-as="${
+        swapNames(metadata['Author (First, Last)'])
+      }" opf:role="aut">${
+        metadata['Author (First, Last)']
+      }</dc:creator>`;
 
       if (doc.includes('<dc:creator />')) return doc.replace('<dc:creator />', newAuthor);
       else if (doc.includes("<dc:creator></dc:creator>")) return doc.replace("<dc:creator></dc:creator>", newAuthor);
@@ -61,7 +89,7 @@ const transformers = {
 
       var res = doc;
 
-      if (!csv) return doc;
+      if (!metadata) return doc;
 
       for (let i = 0, l = verboseTypes.length; i < l; i++) {
         if (metadata[verboseTypes[i]]) {

@@ -25,29 +25,45 @@ const log = console.log,
       logE = _.compose(log, c.bgRed.inverse),
       logS = _.compose(log, c.green),
       nodeArgs = process.argv.slice(2),
-      fileTypes = ['css', 'opf', 'xhtml', 'html'],
+      fileTypes = ['css', 'opf', 'html', 'xhtml'],
       csv = glob.sync('*.csv')[0],
       config = cson.parse(fs.readFileSync('config.cson', 'utf8')),
+      metadata = csv ?
+        Object.assign(
+          Papa.parse(fs.readFileSync(csv, 'utf8'), {
+            header: true
+          }).data[0],
+          config.metadata
+        ) :
+        config.metadata,
       srcFilePath = nodeArgs.length ? nodeArgs[0] : glob.sync('*.epub')[0],
       srcFileName = nodeArgs.length ?
         srcFilePath.substr(srcFilePath.lastIndexOf('/') + 1) : srcFilePath;
 
-fileTypes.forEach(ft => Object.assign(transformers[ft], {
-  regexes: doc => {
-    var res = doc;
-    if (config.regexes && config.regexes[ft] && config.regexes[ft].length) {
-      for (let i = 0, l = config.regexes[ft].length; i < l; i++) {
-        const reg = config.regexes[ft][i],
-              regFind = new RegExp(reg.find, 'g');
+export {metadata, config};
 
-        log(regFind, reg.replace);
+log(typeof transformers);
+log(JSON.stringify(transformers));
 
-        res = res.replace(regFind, reg.replace);
+fileTypes.forEach(ft =>
+  ft !== 'xhtml' &&
+  Object.assign(transformers[ft], {
+    regexes: doc => {
+      var res = doc;
+      if (config.regexes && config.regexes[ft] && config.regexes[ft].length) {
+        for (let i = 0, l = config.regexes[ft].length; i < l; i++) {
+          const reg = config.regexes[ft][i],
+                regFind = new RegExp(reg.find, 'g');
+
+          log(regFind, reg.replace);
+
+          res = res.replace(regFind, reg.replace);
+        }
       }
+      return res;
     }
-    return res;
-  }
-}));
+  })
+);
 
 // TODO 'ignore' property in config.json
 // to choose which transformers to use (default all)
@@ -56,7 +72,11 @@ function setUpTransformers(keyStr) {
   return _.pipeline(_.values(transformers[keyStr]));
 }
 
-const edit = _.object(fileTypes.map(ft => [ft, setUpTransformers(ft)]));
+const edit = _.object(fileTypes.map(ft =>
+  ft === 'xhtml' ?
+    ['xhtml', setUpTransformers('html')] :
+    [ft, setUpTransformers(ft)]
+));
 
 
 // processing begins here -->
