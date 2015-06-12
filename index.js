@@ -71,13 +71,14 @@ Object.assign(_underscoreContrib2['default'], _underscore2['default']);
 var log = console.log,
     logE = _underscoreContrib2['default'].compose(log, _chalk2['default'].bgRed.inverse),
     logS = _underscoreContrib2['default'].compose(log, _chalk2['default'].green),
+    logI = _underscoreContrib2['default'].compose(log, _chalk2['default'].yellow),
     nodeArgs = process.argv.slice(2),
     fileTypes = ['css', 'opf', 'html', 'xhtml'],
     csv = _glob2['default'].sync('*.csv')[0],
     config = _csonParser2['default'].parse(_fs2['default'].readFileSync('config.cson', 'utf8')),
     metadata = csv ? Object.assign(_babyparse2['default'].parse(_fs2['default'].readFileSync(csv, 'utf8'), {
   header: true
-}).data[0], config.metadata) : config.metadata,
+}).data[0], config.metadata) : config.metadata || {},
     srcFilePath = nodeArgs.length ? nodeArgs[0] : _glob2['default'].sync('*.epub')[0],
     srcFileName = nodeArgs.length ? srcFilePath.substr(srcFilePath.lastIndexOf('/') + 1) : srcFilePath;
 
@@ -146,7 +147,7 @@ _fs2['default'].createReadStream(srcFilePath)
     (0, _mkdirp2['default'])('out/' + fileDir, function (err) {
       if (!err) {
         entry.pipe(_fs2['default'].createWriteStream('out/' + filePath)).on('close', function () {
-          log(_chalk2['default'].yellow('Not processed: ' + filePath));
+          logI('Not processed: ' + filePath);
         }).on('error', logE);
       } else logE(err);
     });
@@ -174,15 +175,20 @@ process.on('exit', function () {
     try {
       _fs2['default'].renameSync(srcFileName, 'old-' + srcFileName);
     } catch (e) {
-      logE(e);
+      logI('');
+      logI(e);
+      logI('(this is nothing to worry about if you used `$ node index.js` with a path to your source epub)');
+      logI('');
     }
     _fs2['default'].writeFileSync(srcFileName, epub);
 
-    // if (nodeArgs[0] !== '-debug') {
-    //   rf.sync("./out/META-INF", logE);
-    //   rf.sync("./out/OEBPS", logE);
-    //   rf.sync("./out", logE);
-    // }
+    try {
+      _rimraf2['default'].sync('./out/META-INF');
+      _rimraf2['default'].sync('./out/OEBPS');
+      _rimraf2['default'].sync('./out');
+    } catch (e) {
+      logE(e);
+    }
 
     logS('::: Completed in ' + process.uptime() + ' seconds! :::');
   } catch (e) {
