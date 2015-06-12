@@ -24,18 +24,24 @@ Object.assign(_, underscore);
 const log = console.log,
       logE = _.compose(log, c.bgRed.inverse),
       logS = _.compose(log, c.green),
+      logI = _.compose(log, c.yellow),
+
       nodeArgs = process.argv.slice(2),
+
       fileTypes = ['css', 'opf', 'html', 'xhtml'],
       csv = glob.sync('*.csv')[0],
       config = cson.parse(fs.readFileSync('config.cson', 'utf8')),
-      metadata = csv ?
-        Object.assign(
-          Papa.parse(fs.readFileSync(csv, 'utf8'), {
-            header: true
-          }).data[0],
-          config.metadata
-        ) :
-        config.metadata,
+      metadata = (
+        csv ?
+          Object.assign(
+            Papa.parse(fs.readFileSync(csv, 'utf8'), {
+              header: true
+            }).data[0],
+            config.metadata
+          ) :
+          (config.metadata || {})
+      ),
+
       srcFilePath = nodeArgs.length ? nodeArgs[0] : glob.sync('*.epub')[0],
       srcFileName = nodeArgs.length ?
         srcFilePath.substr(srcFilePath.lastIndexOf('/') + 1) : srcFilePath;
@@ -107,7 +113,7 @@ fs.createReadStream(srcFilePath)
     mkd('out/' + fileDir, err => {
       if (!err) {
         entry.pipe(fs.createWriteStream('out/' + filePath))
-        .on('close', () => { log(c.yellow('Not processed: ' + filePath)); })
+        .on('close', () => { logI('Not processed: ' + filePath); })
         .on('error', logE);
       } else logE(err);
     });
@@ -132,15 +138,20 @@ process.on('exit', () => {
   try {
     let epub = zip("./out");
     try { fs.renameSync(srcFileName, 'old-' + srcFileName); }
-    catch(e) { logE(e); }
+    catch(e) {
+      logI('');
+      logI(e);
+      logI('(this is nothing to worry about if you used `$ node index.js` with a path to your source epub)');
+      logI('');
+    }
     fs.writeFileSync(srcFileName, epub);
 
-    // if (nodeArgs[0] !== '-debug') {
-    //   rf.sync("./out/META-INF", logE);
-    //   rf.sync("./out/OEBPS", logE);
-    //   rf.sync("./out", logE);
-    // }
+    try {
+      rf.sync("./out/META-INF");
+      rf.sync("./out/OEBPS");
+      rf.sync("./out");
+    } catch(e) { logE(e); }
 
-    logS('::: Completed in '+process.uptime()+' seconds! :::');
+    logS(`::: Completed in ${process.uptime()} seconds! :::`);
   } catch (e) { logE(e); }
 });

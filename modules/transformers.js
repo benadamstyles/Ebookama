@@ -56,11 +56,12 @@ const transformers = {
     },
 
     ISBN: doc => {
-      var newISBN = '<dc:identifier xmlns:opf="http://www.idpf.org/2007/opf" opf:scheme="ISBN">' +
-        metadata['eBook ISBN'] +
-        '</dc:identifier>';
-
       if (!metadata['eBook ISBN']) return doc;
+
+      const newISBN = `<dc:identifier xmlns:opf="http://www.idpf.org/2007/opf" opf:scheme="ISBN">${
+        metadata['eBook ISBN']
+      }</dc:identifier>`;
+
       if (!doc.includes(newISBN)) return insertBefore(doc, '</metadata>', '\t' + newISBN + '\n\t');
       else return doc;
     },
