@@ -46,6 +46,7 @@ const log = console.log,
       srcFileName = nodeArgs.length ?
         srcFilePath.substr(srcFilePath.lastIndexOf('/') + 1) : srcFilePath;
 
+// export user configuration for use by transformers
 export {metadata, config};
 
 log(typeof transformers);

@@ -1,28 +1,5 @@
 import {metadata, config} from "../index";
-
-function swapNames(name) {
-  const comma = name.indexOf(',');
-  if (~comma) {
-    let ln = name.substring(0, comma),
-        fn = name.substring(comma + 1).trim();
-    return `${fn} ${ln}`;
-  } else {
-    let sep = name.lastIndexOf(' '),
-        fn = name.substring(0, sep),
-        ln = name.substring(sep + 1).trim();
-    return `${ln}, ${fn}`;
-  }
-}
-
-function insertAfter(doc, locator, str) {
-  const i = doc.indexOf(locator) + locator.length;
-  return doc.substr(0, i) + str + doc.substr(i, doc.length);
-}
-
-function insertBefore(doc, locator, str) {
-  const i = doc.indexOf(locator);
-  return doc.substr(0, i) + str + doc.substr(i, doc.length);
-}
+import * as util from "util";
 
 const transformers = {
 
@@ -95,11 +72,13 @@ const transformers = {
       for (let i = 0, l = verboseTypes.length; i < l; i++) {
         if (metadata[verboseTypes[i]]) {
           res = insertBefore(res, '</metadata>',
-            '\t<dc:contributor xmlns:opf="http://www.idpf.org/2007/opf" opf:file-as="' +
-            swapNames(metadata[verboseTypes[i]]) + '" opf:role="' +
-            abbrevTypes[i] + '">' +
-            metadata[verboseTypes[i]] +
-            '</dc:contributor>' + '\n\t'
+            `\t<dc:contributor xmlns:opf="http://www.idpf.org/2007/opf" opf:file-as="${
+              swapNames(metadata[verboseTypes[i]])
+            }" opf:role="${
+              abbrevTypes[i]
+            }">${
+              metadata[verboseTypes[i]]
+            }</dc:contributor>\n\t`
           );
         }
       }

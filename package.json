@@ -28,6 +28,7 @@
     "bluebird": "^2.9.27",
     "chalk": "^1.0.0",
     "cson-parser": "^1.1.0",
+    "dedent": "^0.4.0",
     "epub-zip": "0.0.1",
     "execsyncs": "^0.1.1",
     "glob": "^5.0.10",
