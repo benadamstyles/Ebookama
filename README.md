@@ -20,6 +20,37 @@ $ npm install
 
 That's it. You're done.
 
+### Usage & Customization
+
+TODO: how to use...
+
+#### Customization
+
+The fractured state of ebook production practices means that we all have our own way of doing things. This program is written with this fact firmly in mind. You can use Ebookama to do many things, if your JavaScript is up to it. The only places you need to write code are the following, everything else is take care of for you:
+
+- `config.cson`
+- `modules/transformers.js`
+- `modules/util.js`
+
+Let's go through them one-by-one.
+
+##### config.cson
+
+TODO
+
+##### modules/transformers.js
+
+This is where you shine. Write any javascript you can think of here, within the following limitations:
+
+- Methods are categorized by filetypes: currently, `css`, `html` or `xhtml`, and `opf`. If your new method is under one of these properties in the `transformers` object, it will be run against all files of that type; and if it's not under one of these properties, it won't get called at all.
+- Every method receives one argument – the file it's getting run against, as a string. Every method must return one argument - the file it's getting run against, _now modified (or not!),_ as a string.
+
+There are some examples in there already. If you don't want to use them, get rid.
+
+##### modules/util.js
+
+Utility functions, for your `transformers` to use. I highly recommend that these be [pure functions](http://adamjonrichardson.com/2014/01/11/pure-functions/) all.
+
 ### Where does the name come from?
 
 - Ebook
