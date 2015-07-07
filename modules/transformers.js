@@ -20,9 +20,9 @@ const transformers = {
     title: doc => {
       if (!metadata) return doc;
 
-      const newTitle = `<dc:title>${metadata.Title}${(
-        metadata.Subtitle ?
-          (': ' + metadata.Subtitle) :
+      const newTitle = `<dc:title>${metadata.title}${(
+        metadata.subtitle ?
+          (': ' + metadata.subtitle) :
           ''
         )}</dc:title>`;
 
@@ -33,10 +33,10 @@ const transformers = {
     },
 
     ISBN: doc => {
-      if (!metadata['eBook ISBN']) return doc;
+      if (!metadata.ebookISBN) return doc;
 
       const newISBN = `<dc:identifier xmlns:opf="http://www.idpf.org/2007/opf" opf:scheme="ISBN">${
-        metadata['eBook ISBN']
+        metadata.ebookISBN
       }</dc:identifier>`;
 
       if (!doc.includes(newISBN)) return insertBefore(doc, '</metadata>', '\t' + newISBN + '\n\t');
@@ -44,12 +44,12 @@ const transformers = {
     },
 
     author: doc => {
-      if (!metadata['Author (First, Last)']) return doc;
+      if (!metadata.author) return doc;
 
       const newAuthor = `<dc:creator xmlns:opf="http://www.idpf.org/2007/opf" opf:file-as="${
-        swapNames(metadata['Author (First, Last)'])
+        swapNames(metadata.author)
       }" opf:role="aut">${
-        metadata['Author (First, Last)']
+        metadata.author
       }</dc:creator>`;
 
       if (doc.includes('<dc:creator />')) return doc.replace('<dc:creator />', newAuthor);
@@ -60,24 +60,21 @@ const transformers = {
 
     otherContribs: doc => {
       const abbrevTypes = ['edt', 'ill', 'trl'],
-            rawTypes = ['Editor', 'Illustrator', 'Translator'],
-            verboseTypes = rawTypes.map(function(str) {
-              return str + ' (First, Last)';
-            });
+            rawTypes = ['editor', 'illustrator', 'translator'];
 
       var res = doc;
 
       if (!metadata) return doc;
 
       for (let i = 0, l = verboseTypes.length; i < l; i++) {
-        if (metadata[verboseTypes[i]]) {
+        if (metadata[rawTypes[i]]) {
           res = insertBefore(res, '</metadata>',
             `\t<dc:contributor xmlns:opf="http://www.idpf.org/2007/opf" opf:file-as="${
-              swapNames(metadata[verboseTypes[i]])
+              swapNames(metadata[rawTypes[i]])
             }" opf:role="${
               abbrevTypes[i]
             }">${
-              metadata[verboseTypes[i]]
+              metadata[rawTypes[i]]
             }</dc:contributor>\n\t`
           );
         }

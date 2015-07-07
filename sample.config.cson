@@ -16,6 +16,16 @@ css: '''
   }
   '''
 
+metadata:
+  'Book':
+    title: 'Book'
+    subtitle: 'A lovely read'
+    ebookISBN: '9781234567890'
+    author: 'John Writer'
+    editor: 'Louise Editor'
+    illustrator: 'Andy Illustrator'
+    translator: 'Wendy Translator'
+
 regexes:
   css: [
     {

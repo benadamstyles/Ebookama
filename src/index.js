@@ -33,20 +33,25 @@ const log = console.log,
       fileTypes = ['css', 'opf', 'html', 'xhtml'],
       csv = glob.sync('*.csv')[0],
       config = cson.parse(fs.readFileSync('config.cson', 'utf8')),
-      metadata = (
-        csv ?
-          Object.assign(
-            Papa.parse(fs.readFileSync(csv, 'utf8'), {
-              header: true
-            }).data[0],
-            config.metadata
-          ) :
-          (config.metadata || {})
-      ),
 
       srcFilePath = nodeArgs.length ? nodeArgs[0] : glob.sync('*.epub')[0],
       srcFileName = nodeArgs.length ?
-        srcFilePath.substr(srcFilePath.lastIndexOf('/') + 1) : srcFilePath;
+        srcFilePath.substr(srcFilePath.lastIndexOf('/') + 1) : srcFilePath,
+      fileNameNoExt = srcFileName.replace('.epub', ''),
+
+      getConfigMetadata = () =>
+        _.hasPath(config, `metadata.${fileNameNoExt}`) ?
+          config.metadata[fileNameNoExt] : {},
+
+      metadata = (
+        csv ?
+          _.extend(
+            Papa.parse(fs.readFileSync(csv, 'utf8'), {
+              header: true
+            }).data[0],
+            getConfigMetadata
+          ) : getConfigMetadata
+      );
 
 // export user configuration for use by transformers
 export {metadata, config};
