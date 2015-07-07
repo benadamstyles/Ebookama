@@ -81,9 +81,7 @@ var log = console.log,
     srcFilePath = nodeArgs.length ? nodeArgs[0] : _glob2['default'].sync('*.epub')[0],
     srcFileName = nodeArgs.length ? srcFilePath.substr(srcFilePath.lastIndexOf('/') + 1) : srcFilePath,
     fileNameNoExt = srcFileName.replace('.epub', ''),
-    getConfigMetadata = function getConfigMetadata() {
-  return _underscoreContrib2['default'].hasPath(config, 'metadata.' + fileNameNoExt) ? config.metadata[fileNameNoExt] : {};
-},
+    getConfigMetadata = _underscoreContrib2['default'].hasPath(config, 'metadata.' + fileNameNoExt) ? config.metadata[fileNameNoExt] : {},
     metadata = csv ? _underscoreContrib2['default'].extend(_babyparse2['default'].parse(_fs2['default'].readFileSync(csv, 'utf8'), {
   header: true
 }).data[0], getConfigMetadata) : getConfigMetadata;
@@ -91,9 +89,6 @@ var log = console.log,
 // export user configuration for use by transformers
 exports.metadata = metadata;
 exports.config = config;
-
-log(typeof _modulesTransformers2['default']);
-log(JSON.stringify(_modulesTransformers2['default']));
 
 fileTypes.forEach(function (ft) {
   return ft !== 'xhtml' && Object.assign(_modulesTransformers2['default'][ft], {

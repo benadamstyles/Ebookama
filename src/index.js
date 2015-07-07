@@ -39,8 +39,7 @@ const log = console.log,
         srcFilePath.substr(srcFilePath.lastIndexOf('/') + 1) : srcFilePath,
       fileNameNoExt = srcFileName.replace('.epub', ''),
 
-      getConfigMetadata = () =>
-        _.hasPath(config, `metadata.${fileNameNoExt}`) ?
+      getConfigMetadata = _.hasPath(config, `metadata.${fileNameNoExt}`) ?
           config.metadata[fileNameNoExt] : {},
 
       metadata = (
@@ -55,9 +54,6 @@ const log = console.log,
 
 // export user configuration for use by transformers
 export {metadata, config};
-
-log(typeof transformers);
-log(JSON.stringify(transformers));
 
 fileTypes.forEach(ft =>
   ft !== 'xhtml' &&

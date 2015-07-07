@@ -1,5 +1,5 @@
 import {metadata, config} from "../index";
-import * as util from "util";
+import * as util from "./util";
 
 const transformers = {
 
@@ -28,7 +28,7 @@ const transformers = {
 
       if (doc.includes('<dc:title />')) return doc.replace('<dc:title />', newTitle);
       else if (doc.includes("<dc:title></dc:title>")) return doc.replace("<dc:title></dc:title>", newTitle);
-      else if (!doc.includes('<dc:title>')) return insertBefore(doc, '</metadata>', '\t' + newTitle + '\n\t');
+      else if (!doc.includes('<dc:title>')) return util.insertBefore(doc, '</metadata>', '\t' + newTitle + '\n\t');
       else return doc;
     },
 
@@ -39,7 +39,7 @@ const transformers = {
         metadata.ebookISBN
       }</dc:identifier>`;
 
-      if (!doc.includes(newISBN)) return insertBefore(doc, '</metadata>', '\t' + newISBN + '\n\t');
+      if (!doc.includes(newISBN)) return util.insertBefore(doc, '</metadata>', '\t' + newISBN + '\n\t');
       else return doc;
     },
 
@@ -47,14 +47,14 @@ const transformers = {
       if (!metadata.author) return doc;
 
       const newAuthor = `<dc:creator xmlns:opf="http://www.idpf.org/2007/opf" opf:file-as="${
-        swapNames(metadata.author)
+        util.swapNames(metadata.author)
       }" opf:role="aut">${
         metadata.author
       }</dc:creator>`;
 
       if (doc.includes('<dc:creator />')) return doc.replace('<dc:creator />', newAuthor);
       else if (doc.includes("<dc:creator></dc:creator>")) return doc.replace("<dc:creator></dc:creator>", newAuthor);
-      else if (!doc.includes('<dc:creator>')) return insertBefore(doc, '</metadata>', '\t' + newAuthor + '\n\t');
+      else if (!doc.includes('<dc:creator>')) return util.insertBefore(doc, '</metadata>', '\t' + newAuthor + '\n\t');
       else return doc;
     },
 
@@ -68,9 +68,9 @@ const transformers = {
 
       for (let i = 0, l = rawTypes.length; i < l; i++) {
         if (metadata[rawTypes[i]]) {
-          res = insertBefore(res, '</metadata>',
+          res = util.insertBefore(res, '</metadata>',
             `\t<dc:contributor xmlns:opf="http://www.idpf.org/2007/opf" opf:file-as="${
-              swapNames(metadata[rawTypes[i]])
+              util.swapNames(metadata[rawTypes[i]])
             }" opf:role="${
               abbrevTypes[i]
             }">${

@@ -8,7 +8,6 @@ module.exports = function(grunt) {
         sourceMap: false
       },
       dist: {
-        // 'index.js': 'src/index.js'
         expand: true,
         cwd: "src/",
         src: ["**/*.js"],

@@ -8,7 +8,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 var _index = require("../index");
 
-var _util = require("util");
+var _util = require("./util");
 
 var util = _interopRequireWildcard(_util);
 
@@ -33,7 +33,7 @@ var transformers = {
 
       var newTitle = "<dc:title>" + _index.metadata.title + "" + (_index.metadata.subtitle ? ": " + _index.metadata.subtitle : "") + "</dc:title>";
 
-      if (doc.includes("<dc:title />")) return doc.replace("<dc:title />", newTitle);else if (doc.includes("<dc:title></dc:title>")) return doc.replace("<dc:title></dc:title>", newTitle);else if (!doc.includes("<dc:title>")) return insertBefore(doc, "</metadata>", "\t" + newTitle + "\n\t");else return doc;
+      if (doc.includes("<dc:title />")) return doc.replace("<dc:title />", newTitle);else if (doc.includes("<dc:title></dc:title>")) return doc.replace("<dc:title></dc:title>", newTitle);else if (!doc.includes("<dc:title>")) return util.insertBefore(doc, "</metadata>", "\t" + newTitle + "\n\t");else return doc;
     },
 
     ISBN: function ISBN(doc) {
@@ -41,15 +41,15 @@ var transformers = {
 
       var newISBN = "<dc:identifier xmlns:opf=\"http://www.idpf.org/2007/opf\" opf:scheme=\"ISBN\">" + _index.metadata.ebookISBN + "</dc:identifier>";
 
-      if (!doc.includes(newISBN)) return insertBefore(doc, "</metadata>", "\t" + newISBN + "\n\t");else return doc;
+      if (!doc.includes(newISBN)) return util.insertBefore(doc, "</metadata>", "\t" + newISBN + "\n\t");else return doc;
     },
 
     author: function author(doc) {
       if (!_index.metadata.author) return doc;
 
-      var newAuthor = "<dc:creator xmlns:opf=\"http://www.idpf.org/2007/opf\" opf:file-as=\"" + swapNames(_index.metadata.author) + "\" opf:role=\"aut\">" + _index.metadata.author + "</dc:creator>";
+      var newAuthor = "<dc:creator xmlns:opf=\"http://www.idpf.org/2007/opf\" opf:file-as=\"" + util.swapNames(_index.metadata.author) + "\" opf:role=\"aut\">" + _index.metadata.author + "</dc:creator>";
 
-      if (doc.includes("<dc:creator />")) return doc.replace("<dc:creator />", newAuthor);else if (doc.includes("<dc:creator></dc:creator>")) return doc.replace("<dc:creator></dc:creator>", newAuthor);else if (!doc.includes("<dc:creator>")) return insertBefore(doc, "</metadata>", "\t" + newAuthor + "\n\t");else return doc;
+      if (doc.includes("<dc:creator />")) return doc.replace("<dc:creator />", newAuthor);else if (doc.includes("<dc:creator></dc:creator>")) return doc.replace("<dc:creator></dc:creator>", newAuthor);else if (!doc.includes("<dc:creator>")) return util.insertBefore(doc, "</metadata>", "\t" + newAuthor + "\n\t");else return doc;
     },
 
     otherContribs: function otherContribs(doc) {
@@ -62,7 +62,7 @@ var transformers = {
 
       for (var i = 0, l = rawTypes.length; i < l; i++) {
         if (_index.metadata[rawTypes[i]]) {
-          res = insertBefore(res, "</metadata>", "\t<dc:contributor xmlns:opf=\"http://www.idpf.org/2007/opf\" opf:file-as=\"" + swapNames(_index.metadata[rawTypes[i]]) + "\" opf:role=\"" + abbrevTypes[i] + "\">" + _index.metadata[rawTypes[i]] + "</dc:contributor>\n\t");
+          res = util.insertBefore(res, "</metadata>", "\t<dc:contributor xmlns:opf=\"http://www.idpf.org/2007/opf\" opf:file-as=\"" + util.swapNames(_index.metadata[rawTypes[i]]) + "\" opf:role=\"" + abbrevTypes[i] + "\">" + _index.metadata[rawTypes[i]] + "</dc:contributor>\n\t");
         }
       }
       return res;
