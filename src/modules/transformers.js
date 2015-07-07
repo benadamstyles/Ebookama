@@ -66,7 +66,7 @@ const transformers = {
 
       if (!metadata) return doc;
 
-      for (let i = 0, l = verboseTypes.length; i < l; i++) {
+      for (let i = 0, l = rawTypes.length; i < l; i++) {
         if (metadata[rawTypes[i]]) {
           res = insertBefore(res, '</metadata>',
             `\t<dc:contributor xmlns:opf="http://www.idpf.org/2007/opf" opf:file-as="${

@@ -11,8 +11,8 @@ module.exports = function(grunt) {
         // 'index.js': 'src/index.js'
         expand: true,
         cwd: "src/",
-        src: ["*.js"],
-        dest: ""
+        src: ["**/*.js"],
+        dest: "dist/"
       }
     }
   });

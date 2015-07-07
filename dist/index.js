@@ -78,11 +78,15 @@ var log = console.log,
     fileTypes = ['css', 'opf', 'html', 'xhtml'],
     csv = _glob2['default'].sync('*.csv')[0],
     config = _csonParser2['default'].parse(_fs2['default'].readFileSync('config.cson', 'utf8')),
-    metadata = csv ? Object.assign(_babyparse2['default'].parse(_fs2['default'].readFileSync(csv, 'utf8'), {
-  header: true
-}).data[0], config.metadata) : config.metadata || {},
     srcFilePath = nodeArgs.length ? nodeArgs[0] : _glob2['default'].sync('*.epub')[0],
-    srcFileName = nodeArgs.length ? srcFilePath.substr(srcFilePath.lastIndexOf('/') + 1) : srcFilePath;
+    srcFileName = nodeArgs.length ? srcFilePath.substr(srcFilePath.lastIndexOf('/') + 1) : srcFilePath,
+    fileNameNoExt = srcFileName.replace('.epub', ''),
+    getConfigMetadata = function getConfigMetadata() {
+  return _underscoreContrib2['default'].hasPath(config, 'metadata.' + fileNameNoExt) ? config.metadata[fileNameNoExt] : {};
+},
+    metadata = csv ? _underscoreContrib2['default'].extend(_babyparse2['default'].parse(_fs2['default'].readFileSync(csv, 'utf8'), {
+  header: true
+}).data[0], getConfigMetadata) : getConfigMetadata;
 
 // export user configuration for use by transformers
 exports.metadata = metadata;
