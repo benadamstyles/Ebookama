@@ -7,6 +7,8 @@ Object.defineProperty(exports, '__esModule', {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
+require('babel/polyfill');
+
 var _underscore = require('underscore');
 
 var _underscore2 = _interopRequireDefault(_underscore);

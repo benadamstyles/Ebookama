@@ -18,6 +18,10 @@ Now that you have the program on your computer, you need to set it up. Don't wor
 $ npm install
 ```
 
+Before you can do anything useful with the program, you'll ned to set up your config file. This involves simply copying `sample.config.cson` to a new file called `config.cson`.
+
+If you want to run the `amzn.js` script (see below for reasons why you might), you'll need to download **Kindlegen** from [here](http://www.amazon.com/gp/feature.html/?docId=1000765211) and put it in the root folder of this project. I'm not allowed to host and share it on GitHub.
+
 That's it. You're done.
 
 ### Usage & Customization

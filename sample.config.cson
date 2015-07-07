@@ -1,0 +1,61 @@
+amzn:
+  'Book':
+    toc_file: 'Book-1.xhtml'
+    toc_id: 'contents'
+    start_reading_file: 'Book-3.xhtml'
+    start_reading_id: 'full-title'
+
+ignore:
+  html: []
+  css: []
+  opf: []
+
+css: '''
+  @media amzn-mobi, amzn-kf8 {
+  \\t.isbn {display: none;}
+  }
+  '''
+
+regexes:
+  css: [
+    {
+      find: '\\s*-epub-ruby-position:over;\\n\\s*color:#000000;\\n'
+      replace: ''
+    }
+    {
+      find: '\\s*color\\s*: #000000;'
+      replace: ''
+    }
+    {
+      find: 'font-family\\s*:\\s*"Minion Pro", serif;'
+      replace: ''
+    }
+    {
+      find: 'text-indent\\s*: -1.3em;\\s*margin\\s*: 0px 0px 0px 1.3em;\\s*}'
+      replace: '''
+        text-indent : -1.3em;
+        \\tmargin : 0px 0px 0px 1.3em;
+        }
+        @media amzn-mobi {
+        \\tp.poem {
+        \\t\\tmargin: 0;
+        \\t}
+        }
+        '''
+    }
+  ]
+  opf: []
+  xhtml: [
+    {
+      find: ' \\. \\. \\.'
+      replace: '&nbsp;.&nbsp;.&nbsp;.'
+    }
+    {
+      find: ' –'
+      replace: '&nbsp;–'
+    }
+    {
+      find: '\\. \\. \\.'
+      replace: '.&nbsp;.&nbsp;.'
+    }
+  ]

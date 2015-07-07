@@ -1,4 +1,6 @@
 // node modules
+import "babel/polyfill";
+
 import underscore from 'underscore';
 import _ from 'underscore-contrib';
 import c from 'chalk';
