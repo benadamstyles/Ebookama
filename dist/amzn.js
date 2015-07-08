@@ -65,7 +65,7 @@ var log = console.log,
     edit = function edit(doc) {
   var fileNameNoExt = srcFileName.replace('.epub', ''),
       data = metadata.amzn[fileNameNoExt],
-      guide = '\n\t<guide>\n\t\t<reference href="Text/' + data.toc_file + '#' + data.toc_id + '" title="Table of Contents" type="toc" />\n\t\t<reference href="Images/cover.jpg" type="cover" />\n\t\t<reference href="Text/' + data.start_reading_file + '#' + (data.start_reading_id || 'full-title') + ' title="Start Reading" type="text" />\n\t</guide>';
+      guide = '\n\t<guide>\n\t\t<reference href="Text/' + data.toc_file + '#' + data.toc_id + '" title="Table of Contents" type="toc" />\n\t\t<reference href="Images/cover.jpg" type="cover" />\n\t\t<reference href="Text/' + data.start_reading_file + '#' + (data.start_reading_id || 'full-title') + '" title="Start Reading" type="text" />\n\t</guide>';
 
   if (doc.includes('<guide />')) return doc.replace('<guide />', guide);else return insertAfter(doc, '</spine>', guide);
 };

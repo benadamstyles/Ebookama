@@ -26,7 +26,11 @@ That's it. You're done.
 
 ### Usage & Customization
 
-TODO: how to use...
+The basic command is as follows:
+
+```
+$ node dist/index.js "path/to/ebook.epub"
+```
 
 #### Customization
 

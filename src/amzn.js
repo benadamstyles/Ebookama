@@ -42,7 +42,7 @@ const log = console.log,
 \t<guide>
 \t\t<reference href="Text/${data.toc_file}#${data.toc_id}" title="Table of Contents" type="toc" />
 \t\t<reference href="Images/cover.jpg" type="cover" />
-\t\t<reference href="Text/${data.start_reading_file}#${data.start_reading_id || 'full-title'} title="Start Reading" type="text" />
+\t\t<reference href="Text/${data.start_reading_file}#${data.start_reading_id || 'full-title'}" title="Start Reading" type="text" />
 \t</guide>`;
 
     if (doc.includes('<guide />')) return doc.replace('<guide />', guide);
