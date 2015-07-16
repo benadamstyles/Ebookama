@@ -89,6 +89,7 @@ var log = console.log,
 // export user configuration for use by transformers
 exports.metadata = metadata;
 exports.config = config;
+exports.srcFilePath = srcFilePath;
 
 fileTypes.forEach(function (ft) {
   return ft !== 'xhtml' && Object.assign(_modulesTransformers2['default'][ft], {

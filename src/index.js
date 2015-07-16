@@ -53,7 +53,7 @@ const log = console.log,
       );
 
 // export user configuration for use by transformers
-export {metadata, config};
+export {metadata, config, srcFilePath};
 
 fileTypes.forEach(ft =>
   ft !== 'xhtml' &&

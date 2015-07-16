@@ -1,5 +1,6 @@
 import {metadata, config} from "../index";
 import * as util from "./util";
+import {getFileList, getContentOf} from '../api';
 
 const transformers = {
 

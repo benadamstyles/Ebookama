@@ -1,52 +1,38 @@
 import fs from 'fs';
 import unzip from 'unzip';
 import glob from 'glob';
+import admZip from 'adm-zip';
+
+import {srcFilePath} from "./index";
 
 // internal functions -->
-const unzipStream = callback =>
+const unzipStream = (callback, end) =>
   fs.createReadStream(srcFilePath)
   .pipe(unzip.Parse())
-  .on('entry', callback);
+  .on('entry', callback)
+  .on('close', end);
 
 // exported methods -->
-const getFileList = () => {};
+const getFileList = () => (new admZip(srcFilePath)).getEntries();
 
-const getContentOf = globbing => unzipStream(entry => {
-  // const filePath = entry.path,
-  //       fileEnding = filePath.substring(filePath.lastIndexOf('.') + 1),
-  //       folderSep = filePath.includes('/') ? '/' : '\\',
-  //       fileDir = filePath.substr(0, filePath.length - fileEnding.length)
-  //         .substring(0, filePath.lastIndexOf(folderSep) + 1),
-  //       run = entry => new Promise((resolve, reject) => {
-  //         var content = '';
-  //         entry.setEncoding('utf8');
-  //         entry.on('data', data => {content += data;})
-  //         .on('end', () => {
-  //           if (edit[fileEnding]) resolve(edit[fileEnding](content));
-  //           else resolve(content);
-  //         });
-  //       });
-  //
-  // if (fileEnding === "png" || fileEnding === "jpg" || fileEnding === "jpeg") {
-  //   mkd('out/' + fileDir, err => {
-  //     if (!err) {
-  //       entry.pipe(fs.createWriteStream('out/' + filePath))
-  //       .on('close', () => { logI('Not processed: ' + filePath); })
-  //       .on('error', logE);
-  //     } else logE(err);
-  //   });
-  // } else {
-  //   run(entry).then(res => {
-  //     mkd('out/' + fileDir, err => {
-  //       if (!err) {
-  //         let w = fs.createWriteStream('out/' + filePath);
-  //         w.on('open', () => {
-  //           w.write(res);
-  //           logS('Processed ' + filePath);
-  //         })
-  //         .on('error', logE);
-  //       } else log(err);
-  //     });
-  //   }).catch(log);
-  // }
+const getContentOf = fileNameMatch => new Promise((resolve, reject) => {
+  const res = [];
+
+  unzipStream(entry => {
+    if (entry.path.includes(fileNameMatch)) {
+      let content = '';
+      entry.setEncoding('utf8');
+
+      entry
+      .on('data', data => {content += data;})
+      .on('end', () => res.push(content));
+    } else {
+      entry.autodrain();
+    }
+  }, function finished() {
+    if (res.length) resolve(res);
+    else reject('No matches');
+  });
 });
+
+export {getFileList, getContentOf};
