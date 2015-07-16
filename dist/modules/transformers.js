@@ -12,6 +12,8 @@ var _util = require("./util");
 
 var util = _interopRequireWildcard(_util);
 
+var _api = require("../api");
+
 var transformers = {
 
   html: {
