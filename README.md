@@ -14,46 +14,81 @@ Once you've got node and npm installed, you need to get this repository on your 
 
 Now that you have the program on your computer, you need to set it up. Don't worry, it's easy. Open the terminal or command line, navigate to this repo on your hard drive, and run the following command (the `$` just means "type this in the terminal and press enter"):
 
-```
+```sh
 $ npm install
 ```
 
-Before you can do anything useful with the program, you'll ned to set up your config file. This involves simply copying `sample.config.cson` to a new file called `config.cson`.
+Before you can do anything useful with the program, you'll need to set up your config file. This involves simply copying `sample.config.cson` to a new file called `config.cson`.
 
-If you want to run the `amzn.js` script (see below for reasons why you might), you'll need to download **Kindlegen** from [here](http://www.amazon.com/gp/feature.html/?docId=1000765211) and put it in the root folder of this project. I'm not allowed to host and share it on GitHub.
+If you want to run the `amzn.js` script (see below for reasons why you might (coming soon!)), you'll need to download **Kindlegen** from [here](http://www.amazon.com/gp/feature.html/?docId=1000765211) and put it in the root folder of this project. I'm not allowed to host and share it on GitHub.
 
 That's it. You're done.
 
 ## Usage & Customization
 
-The basic command is as follows:
+To run Ebookama, type this in your terminal (without the `$`) and press enter:
 
-```
+```sh
 $ node dist/index.js "path/to/ebook.epub"
 ```
 
 ### Customization
 
-The fractured state of ebook production practices means that we all have our own way of doing things. This program is written with this fact firmly in mind. You can use Ebookama to do many things, if your JavaScript is up to it. The only places you need to write code are the following, everything else is take care of for you:
+The fractured state of ebook production practices means that we all have our own way of doing things. This program is written with this fact firmly in mind. You can use Ebookama to do many things, if your JavaScript is up to it. The only places you need to write code are the following, everything else is taken care of for you:
 
-- `config.cson`
-- `modules/transformers.js`
-- `modules/util.js`
+1. `config.cson`
+2. `src/modules/transformers.js`
+3. `src/modules/util.js`
 
-Let's go through them one-by-one.
+**Note:** After changing either **2** or **3**, you'll need to run the following in your terminal to compile it to `dist/`:
+
+```sh
+$ grunt
+```
+
+If you forget, your changes simply won't be reflected and your new method won’t work.
+
+Let's go through the files one-by-one.
 
 #### config.cson
 
 TODO
 
-#### modules/transformers.js
+#### src/modules/transformers.js
 
 This is where you shine. Write any javascript you can think of here, within the following limitations:
 
-- Methods are categorized by filetypes: currently, `css`, `html` or `xhtml`, and `opf`. If your new method is under one of these properties in the `transformers` object, it will be run against all files of that type; and if it's not under one of these properties, it won't get called at all.
-- Every method receives one argument – the file it's getting run against, as a string. Every method must return one argument - the file it's getting run against, _now modified (or not!),_ as a string.
+- Not a limitation, almost the opposite: Ebookama is proudly ES6. All your code will be run through [Babel](http://babeljs.io/), so please feel free to use arrow functions, destructuring, `for of` loops, even generators... go wild.
+- Methods are categorized by filetypes: currently, `css`, `html` (or `xhtml`), and `opf`. If your new method is under one of these properties in the `transformers` object, it will be run against all files of that type; and if it's not under one of these properties, it won't get called at all.
+- Every method receives one argument – the file it’s getting run against, as a string. Every method must return one value – the file it’s getting run against, _now modified (or not!),_ as a string.
 
-There are some examples in there already. If you don't want to use them, get rid.
+Here is an example of a transformer that changes every instance of the words “quite” and “good” in every `.html` and `.xhtml` file in your ebook:
+
+```javascript
+html: {
+  // ... other transformers
+
+  hyperbolic: doc => doc.replace('quite', 'amazingly').replace('good', 'incredible'),
+
+  // ... other transformers
+}
+```
+
+In old-fashioned JavaScript, that would be:
+
+```javascript
+html: {
+  // ... other transformers
+
+  hyperbolic: function(doc) {
+    return doc.replace('quite', 'amazingly').replace('good', 'incredible');
+  },
+
+  // ... other transformers
+}
+```
+
+There are some examples in `src/modules/transformers.js` already. If you don't want to use them, get rid.
 
 ##### File API
 
@@ -76,9 +111,20 @@ getContentOf('main.css').then(contentArray => console.log(contentArray[0]));
 getContentOf('main.css').then(([content]) => console.log(content));
 ```
 
-#### modules/util.js
+#### src/modules/util.js
 
 Utility functions, for your `transformers` to use. I highly recommend that these be [pure functions](http://adamjonrichardson.com/2014/01/11/pure-functions/) all.
+
+An example of a utility function that you might use throughout your `transformers.js`:
+
+```javascript
+const insertBefore = function(doc, locator, str) {
+  const i = doc.indexOf(locator);
+  return doc.substr(0, i) + str + doc.substr(i, doc.length);
+};
+```
+
+**Note:** remember to add the names of your new util functions to the export list at the bottom of `src/modules/util.js`.
 
 ## Where does the name come from?
 

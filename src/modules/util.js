@@ -24,4 +24,8 @@ const insertBefore = function(doc, locator, str) {
   return doc.substr(0, i) + str + doc.substr(i, doc.length);
 };
 
-export {swapNames, insertAfter, insertBefore};
+export {
+  swapNames,
+  insertAfter,
+  insertBefore
+};
