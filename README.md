@@ -2,7 +2,7 @@
 
 A small, extensible program to take the pain away from repetitive ebook wrangling
 
-### Installation
+## Installation
 
 This program requires node.js and npm to be installed on your machine. Until we have time to put instructions here, head to [Google](http://lmgtfy.com/?q=install+node).
 
@@ -24,7 +24,7 @@ If you want to run the `amzn.js` script (see below for reasons why you might), y
 
 That's it. You're done.
 
-### Usage & Customization
+## Usage & Customization
 
 The basic command is as follows:
 
@@ -32,7 +32,7 @@ The basic command is as follows:
 $ node dist/index.js "path/to/ebook.epub"
 ```
 
-#### Customization
+### Customization
 
 The fractured state of ebook production practices means that we all have our own way of doing things. This program is written with this fact firmly in mind. You can use Ebookama to do many things, if your JavaScript is up to it. The only places you need to write code are the following, everything else is take care of for you:
 
@@ -42,11 +42,11 @@ The fractured state of ebook production practices means that we all have our own
 
 Let's go through them one-by-one.
 
-##### config.cson
+#### config.cson
 
 TODO
 
-##### modules/transformers.js
+#### modules/transformers.js
 
 This is where you shine. Write any javascript you can think of here, within the following limitations:
 
@@ -55,11 +55,32 @@ This is where you shine. Write any javascript you can think of here, within the 
 
 There are some examples in there already. If you don't want to use them, get rid.
 
-##### modules/util.js
+##### File API
+
+Ebookama exposes a custom file API for your convenience. So far, it has 2 methods, as follows:
+
+###### getFileList()
+
+- To use it in your `transformers.js`, just call it like `getFileList()`.
+- returns: an array of file entries, which follow the structure as outlined [here](https://github.com/cthackers/adm-zip/wiki/ZipEntry). So, for example, to get an array of full file paths, call `getFileList().map(fileEntry => fileEntry.entryName)`
+
+###### getContentOf(fileNameSearch: String)
+
+- To use it in your `transformers.js`, call it with a string representing some part of the filename you wish to read. So, for example, to get the content of all CSS files, call `getContentOf('.css')`. To get the content of `Chapter-1.html`, call `getContentOf('Chapter-1.html')`. Or `getContentOf('ter-1.h')` if you’re feeling lucky.
+- returns: a [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise), that resolves with an array of strings that are the content of each file matched. So, for example, the following would log the entire text content of `main.css`:
+
+```javascript
+getContentOf('main.css').then(contentArray => console.log(contentArray[0]));
+
+// or if you're being really ES6-y
+getContentOf('main.css').then(([content]) => console.log(content));
+```
+
+#### modules/util.js
 
 Utility functions, for your `transformers` to use. I highly recommend that these be [pure functions](http://adamjonrichardson.com/2014/01/11/pure-functions/) all.
 
-### Where does the name come from?
+## Where does the name come from?
 
 - Ebook
 - **Ebook** **a**uto**ma**tion
