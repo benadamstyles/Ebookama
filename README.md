@@ -52,7 +52,64 @@ Let's go through the files one-by-one.
 
 #### config.cson
 
-TODO
+Set things up here before running ebookama on your files. This file is in CoffeeScript Object Notation, the CoffeeScript version of json. The main reason for this, apart from the welcome lack of superfluous punctuation, is that cson supports multi-line strings, which is pretty useful for our purposes. There are 3 top-level keys: `amzn`, `css`, `ignore`, `metadata`, and `regexes`:
+
+```coffeescript
+amzn: # set up the <guide> data for kindlegen conversion, grouped by filename (ecluding the .epub)
+  'Book':
+    toc_file: 'Book-1.xhtml'
+    toc_id: 'contents'
+    start_reading_file: 'Book-3.xhtml'
+    start_reading_id: 'full-title'
+
+ignore: # TBD
+  html: []
+  css: []
+  opf: []
+
+css: ''' # any css to be appended to your ebook's css file
+  @media amzn-mobi, amzn-kf8 {
+  \\t.isbn {display: none;}
+  }
+  '''
+
+metadata: # grouped by filename (excluding the .epub) – used to populate your ebook's opf file
+  'Book':
+    title: 'Book'
+    subtitle: 'A lovely read'
+    ebookISBN: '9781234567890'
+    author: 'John Writer'
+    editor: 'Louise Editor'
+    illustrator: 'Andy Illustrator'
+    translator: 'Wendy Translator'
+
+regexes: # should be self-explanatory
+  css: [
+    {
+      find: '\\s*-epub-ruby-position:over;\\n\\s*color:#000000;\\n'
+      replace: ''
+    }
+    {
+      find: '\\s*color\\s*: #000000;'
+      replace: ''
+    }
+    {
+      find: 'font-family\\s*:\\s*"Minion Pro", serif;'
+      replace: ''
+    }
+  ]
+  opf: []
+  xhtml: [
+    {
+      find: ' \\. \\. \\.'
+      replace: '&nbsp;.&nbsp;.&nbsp;.'
+    }
+    {
+      find: ' –'
+      replace: '&nbsp;–'
+    }
+  ]
+```
 
 #### src/modules/transformers.js
 
@@ -128,6 +185,6 @@ const insertBefore = function(doc, locator, str) {
 
 ## Where does the name come from?
 
-- Ebook
+- **Ebook**
 - **Ebook** **a**uto**ma**tion
-- Kama Sutra
+- **Kama** Sutra
