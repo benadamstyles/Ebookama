@@ -178,10 +178,10 @@ process.on('exit', function () {
     try {
       _fs2['default'].renameSync(srcFileName, 'old-' + srcFileName);
     } catch (e) {
-      logI('');
-      logI(e);
-      logI('(this is nothing to worry about if you used `$ node index.js` with a path to your source epub)');
-      logI('');
+      if (!nodeArgs.length) {
+        logI('');
+        logI(e);
+      }
     }
     _fs2['default'].writeFileSync(srcFileName, epub);
 
@@ -193,6 +193,7 @@ process.on('exit', function () {
       logE(e);
     }
 
+    logS('');
     logS('::: Completed in ' + process.uptime() + ' seconds! :::');
   } catch (e) {
     logE(e);
