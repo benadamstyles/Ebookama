@@ -1,5 +1,5 @@
 {
-  "name": "Ebookama",
+  "name": "ebookama",
   "version": "0.0.1",
   "description": "A small, extensible program to take the pain away from repetitive ebook wrangling",
   "main": "index.js",
