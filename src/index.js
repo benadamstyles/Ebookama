@@ -1,24 +1,24 @@
 // node modules
-import "babel/polyfill";
+import "babel/polyfill"
 
-import underscore from 'underscore';
-import _ from 'underscore-contrib';
-import c from 'chalk';
-import fs from 'fs';
-import mkd from 'mkdirp';
-import unzip from 'unzip';
-// import Promise from 'bluebird';
-import resumer from 'resumer';
-import zip from 'epub-zip';
-import cson from 'cson-parser';
-import Papa from 'babyparse';
-import rf from 'rimraf';
-import glob from 'glob';
+import underscore from 'underscore'
+import _ from 'underscore-contrib'
+import c from 'chalk'
+import fs from 'fs'
+import mkd from 'mkdirp'
+import unzip from 'unzip'
+// import Promise from 'bluebird'
+import resumer from 'resumer'
+import zip from 'epub-zip'
+import cson from 'cson-parser'
+import Papa from 'babyparse'
+import rf from 'rimraf'
+import glob from 'glob'
 
-import "babel/register";
+import "babel/register"
 
 // my modules
-import transformers from "./modules/transformers";
+import transformers from "./modules/transformers"
 
 // make sure we're using the latest underscore methods
 Object.assign(_, underscore);
@@ -53,8 +53,9 @@ const log = console.log,
       );
 
 // export user configuration for use by transformers
-export {metadata, config, srcFilePath};
+export {metadata, config, srcFilePath}
 
+// add regexes method to each filetype's transformers object
 fileTypes.forEach(ft =>
   ft !== 'xhtml' &&
   Object.assign(transformers[ft], {
@@ -79,7 +80,7 @@ fileTypes.forEach(ft =>
 // to choose which transformers to use (default all)
 
 function setUpTransformers(keyStr) {
-  return _.pipeline(_.values(transformers[keyStr]));
+  return _.pipeline(_.values(transformers[keyStr]))
 }
 
 const edit = _.object(fileTypes.map(ft =>
@@ -108,8 +109,8 @@ fs.createReadStream(srcFilePath)
           entry.setEncoding('utf8');
           entry.on('data', data => {content += data;})
           .on('end', () => {
-            if (edit[fileEnding]) resolve(edit[fileEnding](content));
-            else resolve(content);
+            if (edit[fileEnding]) resolve(edit[fileEnding](content))
+            else resolve(content)
           });
         });
 

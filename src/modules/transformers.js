@@ -1,6 +1,7 @@
-import {metadata, config} from "../index";
-import * as util from "./util";
-import {getFileList, getContentOf} from '../api';
+import {metadata, config} from "../index"
+import * as util from "./util"
+import {getFileList, getContentOf} from '../api'
+import Lazy from 'lazy.js'
 
 const transformers = {
 
@@ -13,13 +14,113 @@ const transformers = {
   },
 
   css: {
-    //
+    removeBlack: doc => util.removeDeclaration(doc, ({value}) =>
+      value === '#000000' || value === '#000'
+    ),
+
+    removeRuby: doc => util.removeDeclaration(doc, ({property}) =>
+      property === '-epub-ruby-position'
+    ),
+
+    removeMinion: doc => util.removeDeclaration(doc, ({value}) =>
+      value.includes('Minion Pro')
+    ),
+
+    mobiHanging: doc => util.cssParse(doc, ast => {
+      function textIndentMatcher({property, value}) {
+        return property === 'text-indent' && Number.parseFloat(value) < 0
+      }
+
+      function getFlushMatcher(indent) {
+        return function({property, value}) {
+          return (property === 'margin' && util.getLeftMargin(value) === indent.replace(/-/g, '')) ||
+            (property === 'margin-left' && value === indent.replace(/-/g, ''))
+        }
+      }
+
+      const rulesWithNegIndent = Lazy(ast.stylesheet.rules)
+        .filter(rule => rule.declarations.some(textIndentMatcher))
+
+      const mediaQuery = {
+        type: 'media',
+        media: 'amzn-mobi',
+        rules: []
+      }
+
+      rulesWithNegIndent.each(rule => {
+        const flushMatcher = getFlushMatcher(rule.declarations.find(textIndentMatcher).value)
+
+        if (rule.declarations.some(flushMatcher)) {
+          mediaQuery.rules.push({
+            type: 'rule',
+            selectors: rule.selectors,
+            declarations: [{
+              type: 'declaration',
+              property: 'margin-left',
+              value: '0'
+            }]
+          })
+        } else {
+          mediaQuery.rules.push({
+            type: 'rule',
+            selectors: rule.selectors,
+            declarations: [{
+              type: 'declaration',
+              property: 'text-indent',
+              value: '0'
+            }]
+          })
+        }
+      })
+
+      if (!rulesWithNegIndent.isEmpty()) ast.stylesheet.rules.push(mediaQuery)
+      return ast
+    }),
+
+    pxToEm: doc => util.cssParse(doc, ast => {
+      const map = new Map([
+        ['14px',  '1.3em'],
+        ['-14px', '-1.3em'],
+        ['28px',  '2.6em'],
+        ['-28px', '-2.6em'],
+        ['43px',  '3.9em'],
+        ['57px',  '5.2em'],
+        ['71px',  '6.5em'],
+        ['85px',  '7.8em'],
+        ['99px',  '9.1em'],
+        ['113px', '10.4em'],
+        ['128px', '11.7em'],
+        ['142px', '13em'],
+        ['156px', '14.3em'],
+        ['170px', '15.6em'],
+        ['184px', '16.9em'],
+        ['198px', '18.2em']
+      ])
+      const declarations = Lazy(ast.stylesheet.rules)
+        .pluck('declarations')
+        .flatten()
+
+      declarations.each(dec => {
+        if (dec && dec.value) {
+          const isShorthand = dec.value.includes(' ')
+          if (isShorthand) {
+            const arr = dec.value.split(' '),
+                  transformed = arr.map(v => map.get(v) || v).join(' ')
+            dec.value = transformed
+          } else {
+            const emVal = map.get(dec.value)
+            if (emVal) dec.value = emVal
+          }
+        }
+      })
+      return ast
+    })
   },
 
   opf: {
 
     title: doc => {
-      if (!metadata) return doc;
+      if (!metadata) return doc
 
       const newTitle = `<dc:title>${metadata.title}${(
         metadata.subtitle ?

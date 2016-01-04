@@ -4,6 +4,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj["default"] = obj; return newObj; } }
 
 var _index = require("../index");
@@ -13,6 +15,10 @@ var _util = require("./util");
 var util = _interopRequireWildcard(_util);
 
 var _api = require("../api");
+
+var _lazyJs = require("lazy.js");
+
+var _lazyJs2 = _interopRequireDefault(_lazyJs);
 
 var transformers = {
 
@@ -26,7 +32,111 @@ var transformers = {
 
   },
 
-  css: {},
+  css: {
+    removeBlack: function removeBlack(doc) {
+      return util.removeDeclaration(doc, function (_ref) {
+        var value = _ref.value;
+        return value === "#000000" || value === "#000";
+      });
+    },
+
+    removeRuby: function removeRuby(doc) {
+      return util.removeDeclaration(doc, function (_ref2) {
+        var property = _ref2.property;
+        return property === "-epub-ruby-position";
+      });
+    },
+
+    removeMinion: function removeMinion(doc) {
+      return util.removeDeclaration(doc, function (_ref3) {
+        var value = _ref3.value;
+        return value.includes("Minion Pro");
+      });
+    },
+
+    mobiHanging: function mobiHanging(doc) {
+      return util.cssParse(doc, function (ast) {
+        function textIndentMatcher(_ref4) {
+          var property = _ref4.property;
+          var value = _ref4.value;
+
+          return property === "text-indent" && Number.parseFloat(value) < 0;
+        }
+
+        function getFlushMatcher(indent) {
+          return function (_ref5) {
+            var property = _ref5.property;
+            var value = _ref5.value;
+
+            return property === "margin" && util.getLeftMargin(value) === indent.replace(/-/g, "") || property === "margin-left" && value === indent.replace(/-/g, "");
+          };
+        }
+
+        var rulesWithNegIndent = (0, _lazyJs2["default"])(ast.stylesheet.rules).filter(function (rule) {
+          return rule.declarations.some(textIndentMatcher);
+        });
+
+        var mediaQuery = {
+          type: "media",
+          media: "amzn-mobi",
+          rules: []
+        };
+
+        rulesWithNegIndent.each(function (rule) {
+          var flushMatcher = getFlushMatcher(rule.declarations.find(textIndentMatcher).value);
+
+          if (rule.declarations.some(flushMatcher)) {
+            mediaQuery.rules.push({
+              type: "rule",
+              selectors: rule.selectors,
+              declarations: [{
+                type: "declaration",
+                property: "margin-left",
+                value: "0"
+              }]
+            });
+          } else {
+            mediaQuery.rules.push({
+              type: "rule",
+              selectors: rule.selectors,
+              declarations: [{
+                type: "declaration",
+                property: "text-indent",
+                value: "0"
+              }]
+            });
+          }
+        });
+
+        if (!rulesWithNegIndent.isEmpty()) ast.stylesheet.rules.push(mediaQuery);
+        return ast;
+      });
+    },
+
+    pxToEm: function pxToEm(doc) {
+      return util.cssParse(doc, function (ast) {
+        var map = new Map([["14px", "1.3em"], ["-14px", "-1.3em"], ["28px", "2.6em"], ["-28px", "-2.6em"], ["43px", "3.9em"], ["57px", "5.2em"], ["71px", "6.5em"], ["85px", "7.8em"], ["99px", "9.1em"], ["113px", "10.4em"], ["128px", "11.7em"], ["142px", "13em"], ["156px", "14.3em"], ["170px", "15.6em"], ["184px", "16.9em"], ["198px", "18.2em"]]);
+        var declarations = (0, _lazyJs2["default"])(ast.stylesheet.rules).pluck("declarations").flatten();
+
+        declarations.each(function (dec) {
+          if (dec && dec.value) {
+            var isShorthand = dec.value.includes(" ");
+            if (isShorthand) {
+              var arr = dec.value.split(" "),
+                  transformed = arr.map(function (v) {
+                return map.get(v) || v;
+              }).join(" ");
+              dec.value = transformed;
+            } else {
+              var emVal = map.get(dec.value);
+              if (emVal) dec.value = emVal;
+            }
+          }
+        });
+        return ast;
+      });
+    }
+  },
 
   opf: {
 
@@ -74,5 +184,3 @@ var transformers = {
 
 exports["default"] = transformers;
 module.exports = exports["default"];
-
-//

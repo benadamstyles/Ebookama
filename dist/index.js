@@ -33,7 +33,7 @@ var _unzip = require('unzip');
 
 var _unzip2 = _interopRequireDefault(_unzip);
 
-// import Promise from 'bluebird';
+// import Promise from 'bluebird'
 
 var _resumer = require('resumer');
 
@@ -91,6 +91,7 @@ exports.metadata = metadata;
 exports.config = config;
 exports.srcFilePath = srcFilePath;
 
+// add regexes method to each filetype's transformers object
 fileTypes.forEach(function (ft) {
   return ft !== 'xhtml' && Object.assign(_modulesTransformers2['default'][ft], {
     regexes: function regexes(doc) {

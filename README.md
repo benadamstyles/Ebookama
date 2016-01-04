@@ -52,7 +52,7 @@ Let's go through the files one-by-one.
 
 #### config.cson
 
-Set things up here before running ebookama on your files. This file is in CoffeeScript Object Notation, the CoffeeScript version of json. The main reason for this, apart from the welcome lack of superfluous punctuation, is that cson supports multi-line strings, which is pretty useful for our purposes. There are 3 top-level keys: `amzn`, `css`, `ignore`, `metadata`, and `regexes`:
+Set things up here before running ebookama on your files. This file is in CoffeeScript Object Notation, the CoffeeScript version of json. The main reason for this, apart from the welcome lack of superfluous punctuation, is that cson supports multi-line strings, which is pretty useful for our purposes. There are several top-level keys: `amzn`, `ignore`, `metadata`, and `regexes`:
 
 ```coffeescript
 amzn: # set up the <guide> data for kindlegen conversion, grouped by filename (ecluding the .epub)
@@ -66,12 +66,6 @@ ignore: # TBD
   html: []
   css: []
   opf: []
-
-css: ''' # any css to be appended to your ebook's css file
-  @media amzn-mobi, amzn-kf8 {
-  \\t.isbn {display: none;}
-  }
-  '''
 
 metadata: # grouped by filename (excluding the .epub) – used to populate your ebook's opf file
   'Book':
