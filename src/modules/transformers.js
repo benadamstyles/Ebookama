@@ -3,7 +3,7 @@ import * as util from "./util"
 import {getFileList, getContentOf} from '../api'
 import Lazy from 'lazy.js'
 
-const transformers = {
+export default {
 
   html: {
 
@@ -195,6 +195,4 @@ const transformers = {
       return res;
     }
   }
-};
-
-export default transformers;
+}

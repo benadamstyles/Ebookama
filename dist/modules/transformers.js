@@ -20,7 +20,7 @@ var _lazyJs = require("lazy.js");
 
 var _lazyJs2 = _interopRequireDefault(_lazyJs);
 
-var transformers = {
+exports["default"] = {
 
   html: {
 
@@ -199,6 +199,4 @@ var transformers = {
     }
   }
 };
-
-exports["default"] = transformers;
 module.exports = exports["default"];
