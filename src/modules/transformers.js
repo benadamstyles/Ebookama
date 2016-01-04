@@ -125,6 +125,23 @@ export default {
         }
       })
       return ast
+    }),
+
+    amznHideISBN: doc => util.cssParse(doc, ast => {
+      ast.stylesheet.rules.push({
+        type: 'media',
+        media: 'amzn-mobi, amzn-kf8',
+        rules: [{
+          type: 'rule',
+          selectors: ['.isbn'],
+          declarations: [{
+            type: 'declaration',
+            property: 'display',
+            value: 'none'
+          }]
+        }]
+      })
+      return ast
     })
   },
 
