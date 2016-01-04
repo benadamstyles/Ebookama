@@ -14,16 +14,27 @@ const transformers = {
   },
 
   css: {
-    removeBlack: doc => util.removeDeclaration(doc, ({value}) =>
+    removeBlack: doc => util.removeDeclarations(doc, ({value}) =>
       value === '#000000' || value === '#000'
     ),
 
-    removeRuby: doc => util.removeDeclaration(doc, ({property}) =>
+    removeRuby: doc => util.removeDeclarations(doc, ({property}) =>
       property === '-epub-ruby-position'
     ),
 
-    removeMinion: doc => util.removeDeclaration(doc, ({value}) =>
+    removeMinion: doc => util.removeDeclarations(doc, ({value}) =>
       value.includes('Minion Pro')
+    ),
+
+    removePageRule: doc => util.cssParse(doc, ast => {
+      const rules = ast.stylesheet.rules,
+            index = rules.findIndex(rule => rule.type === 'page')
+      if (index >= 0) rules.splice(index, 1)
+      return ast
+    }),
+
+    removeAutoHyphens: doc => util.removeDeclarations(doc, ({property}) =>
+      property.includes('-hyphens')
     ),
 
     mobiHanging: doc => util.cssParse(doc, ast => {

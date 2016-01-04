@@ -34,39 +34,57 @@ var transformers = {
 
   css: {
     removeBlack: function removeBlack(doc) {
-      return util.removeDeclaration(doc, function (_ref) {
+      return util.removeDeclarations(doc, function (_ref) {
         var value = _ref.value;
         return value === "#000000" || value === "#000";
       });
     },
 
     removeRuby: function removeRuby(doc) {
-      return util.removeDeclaration(doc, function (_ref2) {
+      return util.removeDeclarations(doc, function (_ref2) {
         var property = _ref2.property;
         return property === "-epub-ruby-position";
       });
     },
 
     removeMinion: function removeMinion(doc) {
-      return util.removeDeclaration(doc, function (_ref3) {
+      return util.removeDeclarations(doc, function (_ref3) {
         var value = _ref3.value;
         return value.includes("Minion Pro");
       });
     },
 
+    removePageRule: function removePageRule(doc) {
+      return util.cssParse(doc, function (ast) {
+        var rules = ast.stylesheet.rules,
+            index = rules.findIndex(function (rule) {
+          return rule.type === "page";
+        });
+        if (index >= 0) rules.splice(index, 1);
+        return ast;
+      });
+    },
+
+    removeAutoHyphens: function removeAutoHyphens(doc) {
+      return util.removeDeclarations(doc, function (_ref4) {
+        var property = _ref4.property;
+        return property.includes("-hyphens");
+      });
+    },
+
     mobiHanging: function mobiHanging(doc) {
       return util.cssParse(doc, function (ast) {
-        function textIndentMatcher(_ref4) {
-          var property = _ref4.property;
-          var value = _ref4.value;
+        function textIndentMatcher(_ref5) {
+          var property = _ref5.property;
+          var value = _ref5.value;
 
           return property === "text-indent" && Number.parseFloat(value) < 0;
         }
 
         function getFlushMatcher(indent) {
-          return function (_ref5) {
-            var property = _ref5.property;
-            var value = _ref5.value;
+          return function (_ref6) {
+            var property = _ref6.property;
+            var value = _ref6.value;
 
             return property === "margin" && util.getLeftMargin(value) === indent.replace(/-/g, "") || property === "margin-left" && value === indent.replace(/-/g, "");
           };

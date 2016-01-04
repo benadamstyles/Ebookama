@@ -9,7 +9,7 @@ exports.swapNames = swapNames;
 exports.insertAfter = insertAfter;
 exports.insertBefore = insertBefore;
 exports.cssParse = cssParse;
-exports.removeDeclaration = removeDeclaration;
+exports.removeDeclarations = removeDeclarations;
 exports.getLeftMargin = getLeftMargin;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
@@ -52,12 +52,15 @@ function cssParse(doc, transformer) {
   return _css2['default'].stringify(transformed);
 }
 
-function removeDeclaration(doc, predicate) {
+function removeDeclarations(doc, predicate) {
   return cssParse(doc, function (ast) {
     var rules = (0, _lazyJs2['default'])(ast.stylesheet.rules);
     rules.each(function (rule) {
-      var declarationIndex = rule.declarations.findIndex(predicate);
-      if (declarationIndex >= 0) rule.declarations.splice(declarationIndex, 1);
+      var declarations = rule.declarations.filter(predicate);
+      declarations.forEach(function (declaration) {
+        var declarationIndex = rule.declarations.indexOf(declaration);
+        if (declarationIndex >= 0) rule.declarations.splice(declarationIndex, 1);
+      });
     });
     return ast;
   });

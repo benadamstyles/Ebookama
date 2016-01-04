@@ -33,12 +33,15 @@ export function cssParse(doc, transformer) {
   return css.stringify(transformed)
 }
 
-export function removeDeclaration(doc, predicate) {
+export function removeDeclarations(doc, predicate) {
   return cssParse(doc, ast => {
     const rules = Lazy(ast.stylesheet.rules)
     rules.each(rule => {
-      const declarationIndex = rule.declarations.findIndex(predicate)
-      if (declarationIndex >= 0) rule.declarations.splice(declarationIndex, 1)
+      const declarations = rule.declarations.filter(predicate)
+      declarations.forEach(declaration => {
+        const declarationIndex = rule.declarations.indexOf(declaration)
+        if (declarationIndex >= 0) rule.declarations.splice(declarationIndex, 1)
+      })
     })
     return ast
   })
