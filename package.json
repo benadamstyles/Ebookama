@@ -1,6 +1,6 @@
 {
   "name": "ebookama",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A small, extensible program to take the pain away from repetitive ebook wrangling",
   "main": "index.js",
   "scripts": {
