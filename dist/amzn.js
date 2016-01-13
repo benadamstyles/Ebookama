@@ -94,7 +94,9 @@ _fs2['default'].createReadStream(srcFilePath).pipe(_unzip2['default'].Parse()).o
         entry.pipe(_fs2['default'].createWriteStream('amzn/' + filePath)).on('close', function () {
           return logS('Processed ' + filePath);
         }).on('error', logE);
-      } else logE(err);
+      } else {
+        logE(err);
+      }
     });
   } else {
     run(entry).then(function (res) {
@@ -107,7 +109,9 @@ _fs2['default'].createReadStream(srcFilePath).pipe(_unzip2['default'].Parse()).o
               logS('Processed ' + filePath);
             }).on('error', logE);
           })();
-        } else logE(err);
+        } else {
+          logE(err);
+        }
       });
     })['catch'](logE);
   }
@@ -120,7 +124,7 @@ process.on('exit', function () {
 
     _fs2['default'].writeFileSync(newFileName, epub);
 
-    log((0, _execsyncs2['default'])('./kindlegen ' + newFileName));
+    log((0, _execsyncs2['default'])('./kindlegen ' + newFileName).toString());
     logS('::: Completed in ' + process.uptime() + ' seconds! :::');
   } catch (e) {
     logE(e);
