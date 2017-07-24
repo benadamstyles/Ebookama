@@ -4,7 +4,8 @@
   "description": "A small, extensible program to take the pain away from repetitive ebook wrangling",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "ebookama": "node dist/index.js",
+    "kindle": "node dist/amzn.js"
   },
   "repository": {
     "type": "git",

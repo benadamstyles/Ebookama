@@ -7,9 +7,9 @@ export default {
 
   html: {
 
-    smallCaps: doc => doc.replace(/(?:<span class=("|')small-caps(?:[\s]*|[\s]char-style-override-\d)\1>)([^<]+)(?:<\/span>)/g,
-      (match, g1, g2, offset, str) => match.replace(g2, g2.toUpperCase())
-    )
+    // smallCaps: doc => doc.replace(/(?:<span class=("|')small-caps(?:[\s]*|[\s]char-style-override-\d)\1>)([^<]+)(?:<\/span>)/g,
+    //   (match, g1, g2, offset, str) => match.replace(g2, g2.toUpperCase())
+    // )
 
   },
 

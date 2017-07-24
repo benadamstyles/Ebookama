@@ -26,10 +26,10 @@ That's it. You're done.
 
 ## Usage & Customization
 
-To run Ebookama, type this in your terminal (without the `$`) and press enter:
+To run Ebookama, type this in your terminal (note the `--`) and press enter:
 
 ```sh
-$ node dist/index.js "path/to/ebook.epub"
+npm run ebookama -- "path/to/ebook.epub"
 ```
 
 ### Customization
