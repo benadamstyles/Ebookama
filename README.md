@@ -43,7 +43,7 @@ The fractured state of ebook production practices means that we all have our own
 **Note:** After changing either **2** or **3**, you'll need to run the following in your terminal to compile it to `dist/`:
 
 ```sh
-$ grunt
+$ npm run build
 ```
 
 If you forget, your changes simply won't be reflected and your new method won’t work.
