@@ -4,7 +4,7 @@ A small, extensible program to take the pain away from repetitive ebook wranglin
 
 ## Installation
 
-This program requires node.js and npm to be installed on your machine. Until we have time to put instructions here, head to [Google](http://lmgtfy.com/?q=install+node).
+This program requires node.js v4+ and npm to be installed on your machine. Until we have time to put instructions here, head to [Google](http://lmgtfy.com/?q=install+node).
 
 Once you've got node and npm installed, you need to get this repository on your computer. Ways to do that, in order of goodness:
 

@@ -1,13 +1,9 @@
-// node modules
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-require('babel/polyfill');
+exports.srcFilePath = exports.config = exports.metadata = undefined;
 
 var _underscore = require('underscore');
 
@@ -33,8 +29,6 @@ var _unzip = require('unzip');
 
 var _unzip2 = _interopRequireDefault(_unzip);
 
-// import Promise from 'bluebird'
-
 var _resumer = require('resumer');
 
 var _resumer2 = _interopRequireDefault(_resumer);
@@ -59,30 +53,34 @@ var _glob = require('glob');
 
 var _glob2 = _interopRequireDefault(_glob);
 
-require('babel/register');
+var _transformers = require('./modules/transformers');
+
+var _transformers2 = _interopRequireDefault(_transformers);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// make sure we're using the latest underscore methods
+Object.assign(_underscoreContrib2.default, _underscore2.default);
 
 // my modules
 
-var _modulesTransformers = require('./modules/transformers');
+// import Promise from 'bluebird'
+// node modules
 
-var _modulesTransformers2 = _interopRequireDefault(_modulesTransformers);
-
-// make sure we're using the latest underscore methods
-Object.assign(_underscoreContrib2['default'], _underscore2['default']);
 
 var log = console.log,
-    logE = _underscoreContrib2['default'].compose(log, _chalk2['default'].bgRed.inverse),
-    logS = _underscoreContrib2['default'].compose(log, _chalk2['default'].green),
-    logI = _underscoreContrib2['default'].compose(log, _chalk2['default'].yellow),
+    logE = _underscoreContrib2.default.compose(log, _chalk2.default.bgRed.inverse),
+    logS = _underscoreContrib2.default.compose(log, _chalk2.default.green),
+    logI = _underscoreContrib2.default.compose(log, _chalk2.default.yellow),
     nodeArgs = process.argv.slice(2),
     fileTypes = ['css', 'opf', 'html', 'xhtml'],
-    csv = _glob2['default'].sync('*.csv')[0],
-    config = _csonParser2['default'].parse(_fs2['default'].readFileSync('config.cson', 'utf8')),
-    srcFilePath = nodeArgs.length ? nodeArgs[0] : _glob2['default'].sync('*.epub')[0],
+    csv = _glob2.default.sync('*.csv')[0],
+    config = _csonParser2.default.parse(_fs2.default.readFileSync('config.cson', 'utf8')),
+    srcFilePath = nodeArgs.length ? nodeArgs[0] : _glob2.default.sync('*.epub')[0],
     srcFileName = nodeArgs.length ? srcFilePath.substr(srcFilePath.lastIndexOf('/') + 1) : srcFilePath,
     fileNameNoExt = srcFileName.replace('.epub', ''),
-    getConfigMetadata = _underscoreContrib2['default'].hasPath(config, 'metadata.' + fileNameNoExt) ? config.metadata[fileNameNoExt] : {},
-    metadata = csv ? _underscoreContrib2['default'].extend(_babyparse2['default'].parse(_fs2['default'].readFileSync(csv, 'utf8'), {
+    getConfigMetadata = _underscoreContrib2.default.hasPath(config, `metadata.${fileNameNoExt}`) ? config.metadata[fileNameNoExt] : {},
+    metadata = csv ? _underscoreContrib2.default.extend(_babyparse2.default.parse(_fs2.default.readFileSync(csv, 'utf8'), {
   header: true
 }).data[0], getConfigMetadata) : getConfigMetadata;
 
@@ -92,8 +90,9 @@ exports.config = config;
 exports.srcFilePath = srcFilePath;
 
 // add regexes method to each filetype's transformers object
+
 fileTypes.forEach(function (ft) {
-  return ft !== 'xhtml' && Object.assign(_modulesTransformers2['default'][ft], {
+  return ft !== 'xhtml' && Object.assign(_transformers2.default[ft], {
     regexes: function regexes(doc) {
       var res = doc;
       if (config.regexes && config.regexes[ft] && config.regexes[ft].length) {
@@ -115,22 +114,19 @@ fileTypes.forEach(function (ft) {
 // to choose which transformers to use (default all)
 
 function setUpTransformers(keyStr) {
-  return _underscoreContrib2['default'].pipeline(_underscoreContrib2['default'].values(_modulesTransformers2['default'][keyStr]));
+  return _underscoreContrib2.default.pipeline(_underscoreContrib2.default.values(_transformers2.default[keyStr]));
 }
 
-var edit = _underscoreContrib2['default'].object(fileTypes.map(function (ft) {
+var edit = _underscoreContrib2.default.object(fileTypes.map(function (ft) {
   return ft === 'xhtml' ? ['xhtml', setUpTransformers('html')] : [ft, setUpTransformers(ft)];
 }));
 
 // processing begins here -->
-_fs2['default'].createReadStream(srcFilePath)
-
+_fs2.default.createReadStream(srcFilePath)
 // unzip the epub
-.pipe(_unzip2['default'].Parse())
-
+.pipe(_unzip2.default.Parse())
 // every time we get an unzipped file, work on it
 .on('entry', function (entry) {
-
   var filePath = entry.path,
       fileEnding = filePath.substring(filePath.lastIndexOf('.') + 1),
       folderSep = filePath.includes('/') ? '/' : '\\',
@@ -148,54 +144,52 @@ _fs2['default'].createReadStream(srcFilePath)
   };
 
   if (fileEnding === 'png' || fileEnding === 'jpg' || fileEnding === 'jpeg') {
-    (0, _mkdirp2['default'])('out/' + fileDir, function (err) {
+    (0, _mkdirp2.default)('out/' + fileDir, function (err) {
       if (!err) {
-        entry.pipe(_fs2['default'].createWriteStream('out/' + filePath)).on('close', function () {
+        entry.pipe(_fs2.default.createWriteStream('out/' + filePath)).on('close', function () {
           logI('Not processed: ' + filePath);
         }).on('error', logE);
       } else logE(err);
     });
   } else {
     run(entry).then(function (res) {
-      (0, _mkdirp2['default'])('out/' + fileDir, function (err) {
+      (0, _mkdirp2.default)('out/' + fileDir, function (err) {
         if (!err) {
-          (function () {
-            var w = _fs2['default'].createWriteStream('out/' + filePath);
-            w.on('open', function () {
-              w.write(res);
-              logS('Processed ' + filePath);
-            }).on('error', logE);
-          })();
+          var w = _fs2.default.createWriteStream('out/' + filePath);
+          w.on('open', function () {
+            w.write(res);
+            logS('Processed ' + filePath);
+          }).on('error', logE);
         } else log(err);
       });
-    })['catch'](log);
+    }).catch(log);
   }
 });
 
 // closing up
 process.on('exit', function () {
   try {
-    var epub = (0, _epubZip2['default'])('./out');
+    var epub = (0, _epubZip2.default)('./out');
     try {
-      _fs2['default'].renameSync(srcFileName, 'old-' + srcFileName);
+      _fs2.default.renameSync(srcFileName, 'old-' + srcFileName);
     } catch (e) {
       if (!nodeArgs.length) {
         logI('');
         logI(e);
       }
     }
-    _fs2['default'].writeFileSync(srcFileName, epub);
+    _fs2.default.writeFileSync(srcFileName, epub);
 
     try {
-      _rimraf2['default'].sync('./out/META-INF');
-      _rimraf2['default'].sync('./out/OEBPS');
-      _rimraf2['default'].sync('./out');
+      _rimraf2.default.sync('./out/META-INF');
+      _rimraf2.default.sync('./out/OEBPS');
+      _rimraf2.default.sync('./out');
     } catch (e) {
       logE(e);
     }
 
     logS('');
-    logS('::: Completed in ' + process.uptime() + ' seconds! :::');
+    logS(`::: Completed in ${process.uptime()} seconds! :::`);
   } catch (e) {
     logE(e);
   }

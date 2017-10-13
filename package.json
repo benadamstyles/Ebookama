@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "ebookama": "node dist/index.js",
-    "kindle": "node dist/amzn.js"
+    "kindle": "node dist/amzn.js",
+    "build": "babel src -d dist"
   },
   "repository": {
     "type": "git",
@@ -33,7 +34,6 @@
     "css": "^2.2.1",
     "dedent": "^0.4.0",
     "epub-zip": "0.0.1",
-    "execsyncs": "^0.1.1",
     "glob": "^5.0.10",
     "lazy.js": "^0.4.2",
     "mkdirp": "^0.5.1",
@@ -44,9 +44,7 @@
     "unzip": "^0.1.11"
   },
   "devDependencies": {
-    "babel": "^5.5.6",
-    "grunt": "^0.4.5",
-    "grunt-babel": "^5.0.1",
-    "load-grunt-tasks": "^3.2.0"
+    "babel-cli": "^6.24.1",
+    "babel-preset-env": "^1.6.0"
   }
 }

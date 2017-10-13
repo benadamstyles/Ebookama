@@ -1,9 +1,5 @@
 'use strict';
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-require('babel/polyfill');
-
 var _underscore = require('underscore');
 
 var _underscore2 = _interopRequireDefault(_underscore);
@@ -24,8 +20,6 @@ var _unzip = require('unzip');
 
 var _unzip2 = _interopRequireDefault(_unzip);
 
-// import resumer from 'resumer';
-
 var _epubZip = require('epub-zip');
 
 var _epubZip2 = _interopRequireDefault(_epubZip);
@@ -34,23 +28,26 @@ var _csonParser = require('cson-parser');
 
 var _csonParser2 = _interopRequireDefault(_csonParser);
 
-// import Papa from 'babyparse';
-
 var _glob = require('glob');
 
 var _glob2 = _interopRequireDefault(_glob);
 
-var _execsyncs = require('execsyncs');
+var _child_process = require('child_process');
 
-var _execsyncs2 = _interopRequireDefault(_execsyncs);
+var _child_process2 = _interopRequireDefault(_child_process);
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// import Papa from 'babyparse';
+
+// import resumer from 'resumer';
 var log = console.log,
-    logE = _underscore2['default'].compose(log, _chalk2['default'].bgRed.inverse),
-    logS = _underscore2['default'].compose(log, _chalk2['default'].green),
-    logI = _underscore2['default'].compose(log, _chalk2['default'].yellow),
+    logE = _underscore2.default.compose(log, _chalk2.default.bgRed.inverse),
+    logS = _underscore2.default.compose(log, _chalk2.default.green),
+    logI = _underscore2.default.compose(log, _chalk2.default.yellow),
     nodeArgs = process.argv.slice(2),
-    metadata = _csonParser2['default'].parse(_fs2['default'].readFileSync('config.cson', 'utf8')),
-    srcFilePath = nodeArgs.length ? nodeArgs[0] : _glob2['default'].sync('*.epub').find(function (name) {
+    metadata = _csonParser2.default.parse(_fs2.default.readFileSync('config.cson', 'utf8')),
+    srcFilePath = nodeArgs.length ? nodeArgs[0] : _glob2.default.sync('*.epub').find(function (name) {
   return name.substr(0, 4) !== 'old-';
 }),
     srcFileName = nodeArgs.length ? srcFilePath.substr(srcFilePath.lastIndexOf('/') + 1) : srcFilePath,
@@ -65,12 +62,17 @@ var log = console.log,
     edit = function edit(doc) {
   var fileNameNoExt = srcFileName.replace('.epub', ''),
       data = metadata.amzn[fileNameNoExt],
-      guide = '\n\t<guide>\n\t\t<reference href="Text/' + data.toc_file + '#' + data.toc_id + '" title="Table of Contents" type="toc" />\n\t\t<reference href="Images/cover.jpg" type="cover" />\n\t\t<reference href="Text/' + data.start_reading_file + '#' + (data.start_reading_id || 'full-title') + '" title="Start Reading" type="text" />\n\t</guide>';
+      guide = `
+\t<guide>
+\t\t<reference href="Text/${data.toc_file}#${data.toc_id}" title="Table of Contents" type="toc" />
+\t\t<reference href="Images/cover.jpg" type="cover" />
+\t\t<reference href="Text/${data.start_reading_file}#${data.start_reading_id || 'full-title'}" title="Start Reading" type="text" />
+\t</guide>`;
 
   if (doc.includes('<guide />')) return doc.replace('<guide />', guide);else return insertAfter(doc, '</spine>', guide);
 };
 
-_fs2['default'].createReadStream(srcFilePath).pipe(_unzip2['default'].Parse()).on('entry', function (entry) {
+_fs2.default.createReadStream(srcFilePath).pipe(_unzip2.default.Parse()).on('entry', function (entry) {
   var filePath = entry.path,
       fileEnding = filePath.substring(filePath.lastIndexOf('.') + 1),
       folderSep = filePath.includes('/') ? '/' : '\\',
@@ -89,10 +91,10 @@ _fs2['default'].createReadStream(srcFilePath).pipe(_unzip2['default'].Parse()).o
   };
 
   if (fileEnding === 'png' || fileEnding === 'jpg' || fileEnding === 'jpeg') {
-    (0, _mkdirp2['default'])('amzn/' + fileDir, function (err) {
+    (0, _mkdirp2.default)('amzn/' + fileDir, function (err) {
       if (!err) {
-        entry.pipe(_fs2['default'].createWriteStream('amzn/' + filePath)).on('close', function () {
-          return logS('Processed ' + filePath);
+        entry.pipe(_fs2.default.createWriteStream(`amzn/${filePath}`)).on('close', function () {
+          return logS(`Processed ${filePath}`);
         }).on('error', logE);
       } else {
         logE(err);
@@ -100,32 +102,30 @@ _fs2['default'].createReadStream(srcFilePath).pipe(_unzip2['default'].Parse()).o
     });
   } else {
     run(entry).then(function (res) {
-      (0, _mkdirp2['default'])('amzn/' + fileDir, function (err) {
+      (0, _mkdirp2.default)('amzn/' + fileDir, function (err) {
         if (!err) {
-          (function () {
-            var w = _fs2['default'].createWriteStream('amzn/' + filePath);
-            w.on('open', function () {
-              w.write(res);
-              logS('Processed ' + filePath);
-            }).on('error', logE);
-          })();
+          var w = _fs2.default.createWriteStream('amzn/' + filePath);
+          w.on('open', function () {
+            w.write(res);
+            logS(`Processed ${filePath}`);
+          }).on('error', logE);
         } else {
           logE(err);
         }
       });
-    })['catch'](logE);
+    }).catch(logE);
   }
 });
 
 process.on('exit', function () {
   try {
-    var epub = (0, _epubZip2['default'])('./amzn'),
+    var epub = (0, _epubZip2.default)('./amzn'),
         newFileName = insertBefore(srcFileName, '.epub', '-amzn');
 
-    _fs2['default'].writeFileSync(newFileName, epub);
+    _fs2.default.writeFileSync(newFileName, epub);
 
-    log((0, _execsyncs2['default'])('./kindlegen ' + newFileName).toString());
-    logS('::: Completed in ' + process.uptime() + ' seconds! :::');
+    log(_child_process2.default.execSync(`./kindlegen ${newFileName}`).toString());
+    logS(`::: Completed in ${process.uptime()} seconds! :::`);
   } catch (e) {
     logE(e);
   }
