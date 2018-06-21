@@ -5,9 +5,7 @@ import Lazy from 'lazy.js'
 
 export default {
   html: {
-    // smallCaps: doc => doc.replace(/(?:<span class=("|')small-caps(?:[\s]*|[\s]char-style-override-\d)\1>)([^<]+)(?:<\/span>)/g,
-    //   (match, g1, g2, offset, str) => match.replace(g2, g2.toUpperCase())
-    // )
+    preventHangingDashes: doc => doc.replace(/\s+–\s*</g, '&nbsp;–<'),
   },
 
   css: {
@@ -173,9 +171,9 @@ export default {
     title: doc => {
       if (!metadata) return doc
 
-      const newTitle = `<dc:title>${metadata.title}${metadata.subtitle
-        ? ': ' + metadata.subtitle
-        : ''}</dc:title>`
+      const newTitle = `<dc:title>${metadata.title}${
+        metadata.subtitle ? ': ' + metadata.subtitle : ''
+      }</dc:title>`
 
       if (doc.includes('<dc:title />'))
         return doc.replace('<dc:title />', newTitle)
@@ -189,7 +187,9 @@ export default {
     ISBN: doc => {
       if (!metadata.ebookISBN) return doc
 
-      const newISBN = `<dc:identifier xmlns:opf="http://www.idpf.org/2007/opf" opf:scheme="ISBN">${metadata.ebookISBN}</dc:identifier>`
+      const newISBN = `<dc:identifier xmlns:opf="http://www.idpf.org/2007/opf" opf:scheme="ISBN">${
+        metadata.ebookISBN
+      }</dc:identifier>`
 
       if (!doc.includes(newISBN))
         return util.insertBefore(doc, '</metadata>', '\t' + newISBN + '\n\t')
@@ -227,9 +227,9 @@ export default {
             '</metadata>',
             `\t<dc:contributor xmlns:opf="http://www.idpf.org/2007/opf" opf:file-as="${util.swapNames(
               metadata[rawTypes[i]]
-            )}" opf:role="${abbrevTypes[i]}">${metadata[
-              rawTypes[i]
-            ]}</dc:contributor>\n\t`
+            )}" opf:role="${abbrevTypes[i]}">${
+              metadata[rawTypes[i]]
+            }</dc:contributor>\n\t`
           )
         }
       }

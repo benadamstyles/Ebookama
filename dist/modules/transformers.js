@@ -22,9 +22,9 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 exports.default = {
   html: {
-    // smallCaps: doc => doc.replace(/(?:<span class=("|')small-caps(?:[\s]*|[\s]char-style-override-\d)\1>)([^<]+)(?:<\/span>)/g,
-    //   (match, g1, g2, offset, str) => match.replace(g2, g2.toUpperCase())
-    // )
+    preventHangingDashes: function preventHangingDashes(doc) {
+      return doc.replace(/\s+–\s*</g, '&nbsp;–<');
+    }
   },
 
   css: {
