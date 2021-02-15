@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/Leeds-eBooks/Ebookama",
   "dependencies": {
-    "adm-zip": "^0.4.7",
+    "adm-zip": "^0.5.2",
     "babyparse": "^0.4.3",
     "bluebird": "^2.9.27",
     "chalk": "^1.0.0",
