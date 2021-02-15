@@ -6,9 +6,10 @@ abbrev@1:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.0.tgz#d0554c2256636e2f56e7c2e5ad183f859428d81f"
 
-adm-zip@^0.4.7:
-  version "0.4.7"
-  resolved "https://registry.yarnpkg.com/adm-zip/-/adm-zip-0.4.7.tgz#8606c2cbf1c426ce8c8ec00174447fd49b6eafc1"
+adm-zip@^0.5.2:
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/adm-zip/-/adm-zip-0.5.2.tgz#8128ec30f4975d977b9285ebd764ae8db03fa6db"
+  integrity sha512-lUI3ZSNsfQXNYNzGjt68MdxzCs0eW29lgL74y/Y2h4nARgHmH3poFWuK3LonvFbNHFt4dTb2X/QQ4c1ZUWWsJw==
 
 ajv@^4.9.1:
   version "4.11.8"
