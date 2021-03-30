@@ -34,7 +34,7 @@
     "mkdirp": "^0.5.1",
     "resumer": "0.0.0",
     "rimraf": "^2.4.0",
-    "underscore": "^1.8.3",
+    "underscore": "^1.12.1",
     "underscore-contrib": "^0.3.0",
     "unzip": "^0.1.11"
   },
