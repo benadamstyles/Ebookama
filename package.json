@@ -24,7 +24,7 @@
     "adm-zip": "^0.4.7",
     "babyparse": "^0.4.3",
     "bluebird": "^2.9.27",
-    "chalk": "^1.0.0",
+    "chalk": "^2.0.0",
     "cson-parser": "^1.1.0",
     "css": "^2.2.1",
     "dedent": "^0.4.0",
